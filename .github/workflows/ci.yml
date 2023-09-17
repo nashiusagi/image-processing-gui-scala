@@ -6,7 +6,7 @@ on:
       - feature/**
 
 jobs:
-  setup:
+  linter:
     runs-on: ubuntu-latest
     container:
       image: hseeberger/scala-sbt:eclipse-temurin-11.0.14.1_1.6.2_2.13.8
