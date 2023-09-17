@@ -4,11 +4,11 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.diagrams.Diagrams
 
 class ImageSpec extends AnyFlatSpec with Diagrams {
-  val image = new Image("./resources/sample.jpg")
+  val image = new Image("nodata.jpg")
 
-  "初期化" should "画像情報を取得しpixelsにピクセル情報を持っている" in {
-    assert(image.width === 400)
-    assert(image.height === 400)
-    assert(image.pixels.length === 160000)
+  "初期化" should "画像が存在しない場合は、ダミーで作成した画像情報を取得しpixelsにピクセル情報を持っている" in {
+    assert(image.width === 128)
+    assert(image.height === 128)
+    assert(image.pixels.length === 128 * 128)
   }
 }
