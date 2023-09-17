@@ -18,7 +18,7 @@ libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % 
 libraryDependencies += "org.scalafx" %% "scalafx" % "19.0.0-R30"
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest-flatspec" % "3.2.17" % "test",
-  "org.scalatest" %% "scalatest-diagrams" % "3.2.17" % "test",
+  "org.scalatest" %% "scalatest-diagrams" % "3.2.17" % "test"
 )
 
 lazy val root = (project in file("."))
