@@ -23,7 +23,7 @@ object HelloSBT extends JFXApp3 {
     root.getChildren.addAll(layerPane)
 
     stage = new JFXApp3.PrimaryStage {
-      scene = new Scene(root) 
+      scene = new Scene(root)
     }
   }
 }
