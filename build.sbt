@@ -28,5 +28,15 @@ lazy val root = (project in file("."))
       "-language:higherKinds",
       "-Xlint",
       "-Xfatal-warnings"
-    ),
+    )
   )
+
+addCommandAlias(
+  "fix",
+  "; all scalafmtSbt scalafmtAll; all Compile/scalafix Test/scalafix; scalafmtAll"
+)
+
+addCommandAlias(
+  "check",
+  "; scalafmtSbtCheck; scalafmtCheckAll; Compile/scalafix --check; Test/scalafix --check"
+)
