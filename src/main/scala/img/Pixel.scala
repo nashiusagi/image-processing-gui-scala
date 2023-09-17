@@ -3,13 +3,13 @@ package img
 import scalafx.scene.paint.Color
 
 class Pixel(
-    _x: Int,
-    _y: Int,
-    _color: Int
+    coordX: Int,
+    coordY: Int,
+    argbData: Int
 ) {
-  val x: Int = _x
-  val y: Int = _y
-  val color: Int = _color
+  val x: Int = coordX
+  val y: Int = coordY
+  val color: Int = argbData
 
   def getColor(): Color = {
     val alpha: Double = ((color >> 24) & 0xff) / 255.0
