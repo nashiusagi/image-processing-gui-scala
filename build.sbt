@@ -15,6 +15,7 @@ inThisBuild(
 )
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.1"
+libraryDependencies += "org.scalafx" %% "scalafx" % "19.0.0-R30"
 
 lazy val root = (project in file("."))
   .settings(
