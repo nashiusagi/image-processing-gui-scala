@@ -15,6 +15,8 @@ import java.awt.image.BufferedImage.TYPE_INT_ARGB
 import java.io.File
 import javax.imageio.ImageIO
 import img.Pixel
+import scalafx.scene.control.Button
+import scalafx.scene.layout.VBox
 
 object HelloSBT extends JFXApp3 {
   override def start(): Unit = {
@@ -25,23 +27,32 @@ object HelloSBT extends JFXApp3 {
     val origPixels: List[Pixel] = bufferedImage2Pixels(bufImage)
     val image: Image =
       new Image(origPixels, bufImage.getWidth, bufImage.getHeight)
-    // val writableImage = new WritableImage(image.width, image.height)
-    // SwingFXUtils.toFXImage(image.image, writableImage)
 
-    //
-    val gaussianFilter = new GaussianFilter(3, 1.3)
-    val out = gaussianFilter.filtering(image)
-    val writableImage = new WritableImage(out.width, out.height)
-    SwingFXUtils.toFXImage(out.image, writableImage)
+    val writableImage = new WritableImage(image.width, image.height)
+    SwingFXUtils.toFXImage(image.image, writableImage)
 
-    val canvas = new Canvas(out.width, out.height);
+    val canvas = new Canvas(1080, 1080);
     val gc = canvas.graphicsContext2D
     gc.drawImage(writableImage, 0, 0)
 
+    val gaussianFilterButton: Button = new Button("gassian filter")
+    gaussianFilterButton.setOnAction((_) -> {
+      val gaussianFilter = new GaussianFilter(3, 1.3)
+      val out = gaussianFilter.filtering(image)
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
     val layerPane = new Pane();
     layerPane.getChildren().addAll(canvas)
-    val root = new HBox()
-    root.getChildren.addAll(layerPane)
+    val buttons = new HBox()
+    buttons.getChildren.addAll(gaussianFilterButton)
+    val layer = new HBox()
+    layer.getChildren.addAll(canvas)
+    val root = new VBox()
+    root.getChildren.addAll(buttons, layer)
 
     stage = new JFXApp3.PrimaryStage {
       scene = new Scene(root)
