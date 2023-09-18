@@ -25,11 +25,11 @@ object HelloSBT extends JFXApp3 {
     val origPixels: List[Pixel] = bufferedImage2Pixels(bufImage)
     val image: Image =
       new Image(origPixels, bufImage.getWidth, bufImage.getHeight)
-    //val writableImage = new WritableImage(image.width, image.height)
-    //SwingFXUtils.toFXImage(image.image, writableImage)
+    // val writableImage = new WritableImage(image.width, image.height)
+    // SwingFXUtils.toFXImage(image.image, writableImage)
 
     //
-    val gaussianFilter = new GaussianFilter(3)
+    val gaussianFilter = new GaussianFilter(3, 1.3)
     val out = gaussianFilter.filtering(image)
     val writableImage = new WritableImage(out.width, out.height)
     SwingFXUtils.toFXImage(out.image, writableImage)
@@ -37,7 +37,6 @@ object HelloSBT extends JFXApp3 {
     val canvas = new Canvas(out.width, out.height);
     val gc = canvas.graphicsContext2D
     gc.drawImage(writableImage, 0, 0)
-
 
     val layerPane = new Pane();
     layerPane.getChildren().addAll(canvas)
