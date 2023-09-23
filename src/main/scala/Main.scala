@@ -6,21 +6,51 @@ import scalafx.scene.canvas.Canvas
 import scalafx.scene.layout.Pane
 import scalafx.scene.image.WritableImage
 import scalafx.embed.swing.SwingFXUtils
+import img.filtering.GaussianFilter
+import scala.util.Success
+import scala.util.Failure
+import java.awt.image.BufferedImage
+import java.awt.image.BufferedImage.TYPE_INT_ARGB
+import img.Pixel
+import scalafx.scene.control.Button
+import scalafx.scene.layout.VBox
+import img._
 
 object HelloSBT extends JFXApp3 {
   override def start(): Unit = {
-    val image: Image = new Image("./resources/sample.jpg")
+    val bufImage: BufferedImage = img.load("./resources/sample.png") match {
+      case Success(src) => src
+      case Failure(_)   => new BufferedImage(128, 128, TYPE_INT_ARGB)
+    }
+    val origPixels: List[Pixel] = img.bufferedImageToPixels(bufImage)
+    val image: Image =
+      new Image(origPixels, bufImage.getWidth, bufImage.getHeight)
+
     val writableImage = new WritableImage(image.width, image.height)
     SwingFXUtils.toFXImage(image.image, writableImage)
 
-    val canvas = new Canvas(image.width, image.height);
+    val canvas = new Canvas(1080, 1080);
     val gc = canvas.graphicsContext2D
     gc.drawImage(writableImage, 0, 0)
 
+    val gaussianFilterButton: Button = new Button("gassian filter")
+    gaussianFilterButton.setOnAction((_) -> {
+      val gaussianFilter = new GaussianFilter(3, 1.3)
+      val out = gaussianFilter.filtering(image)
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
     val layerPane = new Pane();
     layerPane.getChildren().addAll(canvas)
-    val root = new HBox()
-    root.getChildren.addAll(layerPane)
+    val buttons = new HBox()
+    buttons.getChildren.addAll(gaussianFilterButton)
+    val layer = new HBox()
+    layer.getChildren.addAll(canvas)
+    val root = new VBox()
+    root.getChildren.addAll(buttons, layer)
 
     stage = new JFXApp3.PrimaryStage {
       scene = new Scene(root)
