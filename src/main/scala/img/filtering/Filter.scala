@@ -23,34 +23,10 @@ class Filter(kSize: Int) {
           y < paddingSize || y > src.height + paddingSize - 1 || x < paddingSize || x > src.width + paddingSize - 1
         ) new Pixel(x, y, 0xff000000)
         else {
-          var sumR: Double = 0.0
-          var sumG: Double = 0.0
-          var sumB: Double = 0.0
-
-          for (
-            ky <- -paddingSize until kernelSize - 1;
-            kx <- -paddingSize until kernelSize - 1
-          ) {
-            sumR += kernel(
-              (ky + paddingSize) * kernelSize + (kx + paddingSize)
-            ) * paddedImg
-              .pixels((y + ky) * paddedImg.width + x + kx)
-              .red
-            sumG += kernel(
-              (ky + paddingSize) * kernelSize + (kx + paddingSize)
-            ) * paddedImg
-              .pixels((y + ky) * paddedImg.width + x + kx)
-              .green
-            sumB += kernel(
-              (ky + paddingSize) * kernelSize + (kx + paddingSize)
-            ) * paddedImg
-              .pixels((y + ky) * paddedImg.width + x + kx)
-              .blue
-          }
-
-          sumR = if (sumR > 1.0) 1.0 else sumR
-          sumG = if (sumG > 1.0) 1.0 else sumG
-          sumB = if (sumB > 1.0) 1.0 else sumB
+          val sumRGB = fold(kernel, paddedImg, x, y)
+          val sumR = sumRGB(0)
+          val sumG = sumRGB(1)
+          val sumB = sumRGB(2)
 
           val newColor =
             0xff000000 + ((sumR * 255).toInt << 16) + ((sumG * 255).toInt << 8) + (sumB * 255).toInt
@@ -69,6 +45,48 @@ class Filter(kSize: Int) {
     val out: Image = unpadding(filtered)
 
     out
+  }
+
+  def fold(
+      kernel: List[Double],
+      paddedImg: Image,
+      x: Int,
+      y: Int
+  ): List[Double] = {
+    val sumR: Double = (0 until kernelSize * kernelSize).toList
+      .map(idx =>
+        kernel(idx) * paddedImg
+          .getPixel(
+            x + idx % kernelSize - paddingSize,
+            y + idx / kernelSize - paddingSize
+          )
+          .red
+      )
+      .foldLeft(0.0)(_ + _)
+
+    val sumG: Double = (0 until kernelSize * kernelSize).toList
+      .map(idx =>
+        kernel(idx) * paddedImg
+          .getPixel(
+            x + idx % kernelSize - paddingSize,
+            y + idx / kernelSize - paddingSize
+          )
+          .green
+      )
+      .foldLeft(0.0)(_ + _)
+
+    val sumB: Double = (0 until kernelSize * kernelSize).toList
+      .map(idx =>
+        kernel(idx) * paddedImg
+          .getPixel(
+            x + idx % kernelSize - paddingSize,
+            y + idx / kernelSize - paddingSize
+          )
+          .blue
+      )
+      .foldLeft(0.0)(_ + _)
+
+    List(sumR, sumG, sumB).map(c => clip(c, 1.0))
   }
 
   def padding(src: Image): Image = {
@@ -118,4 +136,6 @@ class Filter(kSize: Int) {
 
     new Image(unpaddedPixels, unpaddedWidth, unpaddedHeight)
   }
+
+  def clip(x: Double, ceil: Double) = if (x < ceil) x else ceil
 }

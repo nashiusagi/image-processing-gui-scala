@@ -18,4 +18,7 @@ class Image(pixs: List[Pixel], w: Int, h: Int) {
     bufImage
   }
 
+  def getPixel(x: Int, y: Int): Pixel = {
+    pixels(y * width + x)
+  }
 }
