@@ -16,10 +16,10 @@ class BilinearInterpolation(rx: Double, ry: Double) {
     val interpolatedPixels: List[Pixel] =
       for (y <- (0 until aH).toList; x <- (0 until aW).toList) yield {
         val yBefore = Math.min(Math.floor(y / ay).toInt, srcHeight - 2)
-        val dy = y / ay - yBefore
+        val dy = (y / ay).toInt - yBefore
 
         val xBefore = Math.min(Math.floor(x / ax).toInt, srcWidth - 2)
-        val dx = x / ax - xBefore
+        val dx = (x / ax).toInt - xBefore
 
         // compute bi-linear
         val red = (1 - dx) * (1 - dy) * src.getPixel(xBefore, yBefore).red
