@@ -43,10 +43,20 @@ object HelloSBT extends JFXApp3 {
       gc.drawImage(writableImageFiltered, 0, 0)
     })
 
+    val biliearInterpolateButton: Button = new Button("bi-linear")
+    biliearInterpolateButton.setOnAction((_) -> {
+      val bilinearInterpolation = new BilinearInterpolation(1.5, 1.5)
+      val out = bilinearInterpolation.interpolate(image)
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
     val layerPane = new Pane();
     layerPane.getChildren().addAll(canvas)
     val buttons = new HBox()
-    buttons.getChildren.addAll(gaussianFilterButton)
+    buttons.getChildren.addAll(gaussianFilterButton, biliearInterpolateButton)
     val layer = new HBox()
     layer.getChildren.addAll(canvas)
     val root = new VBox()
