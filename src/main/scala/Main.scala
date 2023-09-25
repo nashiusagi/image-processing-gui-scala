@@ -33,6 +33,15 @@ object HelloSBT extends JFXApp3 {
     val gc = canvas.graphicsContext2D
     gc.drawImage(writableImage, 0, 0)
 
+    val grayscaleButton: Button = new Button("grayscale")
+    grayscaleButton.setOnAction((_) -> {
+      val out = image.grayScale()
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
     val gaussianFilterButton: Button = new Button("gassian filter")
     gaussianFilterButton.setOnAction((_) -> {
       val gaussianFilter = new GaussianFilter(3, 1.3)
@@ -53,10 +62,25 @@ object HelloSBT extends JFXApp3 {
       gc.drawImage(writableImageFiltered, 0, 0)
     })
 
+    val saliencyMapButton: Button = new Button("saliency map")
+    saliencyMapButton.setOnAction((_) -> {
+      val saliencyMap = new SaliencyMap(image.grayScale())
+      val out = saliencyMap.saliencyMap()
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
     val layerPane = new Pane();
     layerPane.getChildren().addAll(canvas)
     val buttons = new HBox()
-    buttons.getChildren.addAll(gaussianFilterButton, biliearInterpolateButton)
+    buttons.getChildren.addAll(
+      grayscaleButton,
+      gaussianFilterButton,
+      biliearInterpolateButton,
+      saliencyMapButton
+    )
     val layer = new HBox()
     layer.getChildren.addAll(canvas)
     val root = new VBox()
