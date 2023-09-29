@@ -62,7 +62,7 @@ class Image(pixs: List[Pixel], w: Int, h: Int) {
     // red == green == blue if grayscale
     val grayColorList: List[Double] = for (pix <- pixels) yield pix.red
 
-    val maxGrayColor=grayColorList.max
+    val maxGrayColor = grayColorList.max
     println(maxGrayColor)
 
     val normalizedPixels: List[Pixel] =
