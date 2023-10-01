@@ -86,6 +86,20 @@ object HelloSBT extends JFXApp3 {
       gc.drawImage(writableImageFiltered, 0, 0)
     })
 
+    val olientSaliencyMapButton: Button = new Button("olient saliency map")
+    olientSaliencyMapButton.setOnAction((_) -> {
+      val saliencyMap = new ittiSaliencyMap()
+      val (map0, map45, map90, map135) =
+        saliencyMap.calcOrientationSaliencyMap(image)
+      val out = map0.scaling(0.25) + map45.scaling(0.25) + map90.scaling(
+        0.25
+      ) + map135.scaling(0.25)
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
     val gaborButton: Button = new Button("gabor")
     gaborButton.setOnAction((_) -> {
       val gaborFilter = new GaborFilter(111, 10.0, 1.2, 10, 0, 45)
@@ -105,6 +119,7 @@ object HelloSBT extends JFXApp3 {
       biliearInterpolateButton,
       saliencyMapButton,
       colorSaliencyMapButton,
+      olientSaliencyMapButton,
       gaborButton
     )
     val layer = new HBox()

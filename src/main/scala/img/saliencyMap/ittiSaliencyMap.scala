@@ -1,6 +1,7 @@
 package img.saliencyMap
 
 import img._
+import _root_.img.filtering.GaborFilter
 
 class ittiSaliencyMap() extends SaliencyMap() {
   def calcRImage(src: Image): Image = {
@@ -81,5 +82,48 @@ class ittiSaliencyMap() extends SaliencyMap() {
         .+((bPyramid(2) - yPyramid(2)) - (bPyramid(3) - yPyramid(3)))
 
     (rgMap, byMap)
+  }
+
+  def calcOrientationSaliencyMap(src: Image): (Image, Image, Image, Image) = {
+    val gaborFilter0 = new GaborFilter(111, 10.0, 1.2, 10, 0, 0)
+    val gaborFilter45 = new GaborFilter(111, 10.0, 1.2, 10, 0, 45)
+    val gaborFilter90 = new GaborFilter(111, 10.0, 1.2, 10, 0, 90)
+    val gaborFilter135 = new GaborFilter(111, 10.0, 1.2, 10, 0, 135)
+
+    val gaborFilterdImage0: Image = gaborFilter0.filtering(src)
+    val gaborFilterdImage45: Image = gaborFilter45.filtering(src)
+    val gaborFilterdImage90: Image = gaborFilter90.filtering(src)
+    val gaborFilterdImage135: Image = gaborFilter135.filtering(src)
+
+    val pyramid0 = makePyramid(gaborFilterdImage0)
+    val pyramid45 = makePyramid(gaborFilterdImage45)
+    val pyramid90 = makePyramid(gaborFilterdImage90)
+    val pyramid135 = makePyramid(gaborFilterdImage135)
+
+    val map0 =
+      ((pyramid0(0) - pyramid0(0)) - (pyramid0(1) - pyramid0(1)))
+        .+((pyramid0(0) - pyramid0(0)) - (pyramid0(2) - pyramid0(2)))
+        .+((pyramid0(1) - pyramid0(1)) - (pyramid0(2) - pyramid0(2)))
+        .+((pyramid0(2) - pyramid0(2)) - (pyramid0(3) - pyramid0(3)))
+
+    val map45 =
+      ((pyramid45(0) - pyramid45(0)) - (pyramid45(1) - pyramid45(1)))
+        .+((pyramid45(0) - pyramid45(0)) - (pyramid45(2) - pyramid45(2)))
+        .+((pyramid45(1) - pyramid45(1)) - (pyramid45(2) - pyramid45(2)))
+        .+((pyramid45(2) - pyramid45(2)) - (pyramid45(3) - pyramid45(3)))
+
+    val map90 =
+      ((pyramid90(0) - pyramid90(0)) - (pyramid90(1) - pyramid90(1)))
+        .+((pyramid90(0) - pyramid90(0)) - (pyramid90(2) - pyramid90(2)))
+        .+((pyramid90(1) - pyramid90(1)) - (pyramid90(2) - pyramid90(2)))
+        .+((pyramid90(2) - pyramid90(2)) - (pyramid90(3) - pyramid90(3)))
+
+    val map135 =
+      ((pyramid135(0) - pyramid135(0)) - (pyramid135(1) - pyramid135(1)))
+        .+((pyramid135(0) - pyramid135(0)) - (pyramid135(2) - pyramid135(2)))
+        .+((pyramid135(1) - pyramid135(1)) - (pyramid135(2) - pyramid135(2)))
+        .+((pyramid135(2) - pyramid135(2)) - (pyramid135(3) - pyramid135(3)))
+
+    (map0, map45, map90, map135)
   }
 }
