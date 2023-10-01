@@ -69,6 +69,17 @@ class Pixel(
     new Pixel(x, y, newColor)
   }
 
+  def scaling(scalar: Double): Pixel = {
+    val scaledRed = scalar * this.red
+    val scaledGreen = scalar * this.green
+    val scaledBlue = scalar * this.blue
+
+    val newColor =
+      0xff000000 + ((scaledRed * 255).toInt << 16) + ((scaledGreen * 255).toInt << 8) + (scaledBlue * 255).toInt
+
+    new Pixel(x, y, newColor)
+  }
+
   def normalize(maxR: Double, maxG: Double, maxB: Double): Pixel = {
     val normRed = this.red / maxR
     val normGreen = this.green / maxG

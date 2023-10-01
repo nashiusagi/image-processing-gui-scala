@@ -1,3 +1,4 @@
+import img.saliencyMap.SaliencyMap
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import img.Image
@@ -15,6 +16,7 @@ import img.Pixel
 import scalafx.scene.control.Button
 import scalafx.scene.layout.VBox
 import img._
+import _root_.img.saliencyMap.ittiSaliencyMap
 
 object HelloSBT extends JFXApp3 {
   override def start(): Unit = {
@@ -64,8 +66,19 @@ object HelloSBT extends JFXApp3 {
 
     val saliencyMapButton: Button = new Button("saliency map")
     saliencyMapButton.setOnAction((_) -> {
-      val saliencyMap = new SaliencyMap(image.grayScale())
-      val out = saliencyMap.saliencyMap()
+      val saliencyMap = new SaliencyMap()
+      val out = saliencyMap.saliencyMap(image.grayScale())
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
+    val colorSaliencyMapButton: Button = new Button("color saliency map")
+    colorSaliencyMapButton.setOnAction((_) -> {
+      val saliencyMap = new ittiSaliencyMap()
+      val (rg, by) = saliencyMap.calcColorSaliencyMap(image)
+      val out = rg.scaling(0.5) + by.scaling(0.5)
 
       val writableImageFiltered = new WritableImage(out.width, out.height)
       SwingFXUtils.toFXImage(out.image, writableImageFiltered)
@@ -79,7 +92,8 @@ object HelloSBT extends JFXApp3 {
       grayscaleButton,
       gaussianFilterButton,
       biliearInterpolateButton,
-      saliencyMapButton
+      saliencyMapButton,
+      colorSaliencyMapButton
     )
     val layer = new HBox()
     layer.getChildren.addAll(canvas)

@@ -52,6 +52,16 @@ class Image(pixs: List[Pixel], w: Int, h: Int) {
     new Image(diffPixels, width, height)
   }
 
+  def scaling(scalar: Double): Image = {
+    val scaledPixels: List[Pixel] =
+      for (pix <- this.pixels)
+        yield {
+          pix.scaling(scalar)
+        }
+
+    new Image(scaledPixels, width, height)
+  }
+
   def grayScale(): Image = {
     val grayscalePixels: List[Pixel] = for (pix <- pixels) yield pix.grayScale()
 

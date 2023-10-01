@@ -1,15 +1,13 @@
-package img
+package img.saliencyMap
 
-import _root_.img.filtering.GaussianFilter
+import img.Image
+import img.filtering.GaussianFilter
+import img.BilinearInterpolation
 
-class SaliencyMap(src: Image) {
-  val gray: Image = src
-  val width: Int = src.width
-  val height: Int = src.height
-
+class SaliencyMap() {
   val gaussianFilter = new GaussianFilter(3, 1.3)
 
-  def makePyramid(): List[Image] = {
+  def makePyramid(orig: Image): List[Image] = {
     val pyramid: List[Image] = for (i <- (1 to 6).toList) yield {
       val upScale: Double = Math.pow(2, i).toDouble
       val downScale: Double = 1 / upScale
@@ -17,7 +15,7 @@ class SaliencyMap(src: Image) {
         new BilinearInterpolation(downScale, downScale)
       val upScaleInterpolation = new BilinearInterpolation(upScale, upScale)
 
-      val downscaledImage: Image = downScaleInterpolation.interpolate(gray)
+      val downscaledImage: Image = downScaleInterpolation.interpolate(orig)
       val gaussian = gaussianFilter.filtering(downscaledImage)
       val upScaledImage: Image =
         upScaleInterpolation.interpolate(gaussian)
@@ -25,11 +23,11 @@ class SaliencyMap(src: Image) {
       upScaledImage
     }
 
-    gray :: pyramid
+    orig :: pyramid
   }
 
-  def saliencyMap(): Image = {
-    val pyramid = makePyramid()
+  def saliencyMap(orig: Image): Image = {
+    val pyramid = makePyramid(orig)
     val out: Image =
       (pyramid(0) - pyramid(1))
         .+(pyramid(0) - pyramid(2))
