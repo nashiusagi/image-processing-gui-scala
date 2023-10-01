@@ -17,6 +17,7 @@ import scalafx.scene.control.Button
 import scalafx.scene.layout.VBox
 import img._
 import _root_.img.saliencyMap.ittiSaliencyMap
+import _root_.img.filtering.GaborFilter
 
 object HelloSBT extends JFXApp3 {
   override def start(): Unit = {
@@ -85,6 +86,16 @@ object HelloSBT extends JFXApp3 {
       gc.drawImage(writableImageFiltered, 0, 0)
     })
 
+    val gaborButton: Button = new Button("gabor")
+    gaborButton.setOnAction((_) -> {
+      val gaborFilter = new GaborFilter(111, 10.0, 1.2, 10, 0, 45)
+      val out = gaborFilter.kernelToImage
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
     val layerPane = new Pane();
     layerPane.getChildren().addAll(canvas)
     val buttons = new HBox()
@@ -93,7 +104,8 @@ object HelloSBT extends JFXApp3 {
       gaussianFilterButton,
       biliearInterpolateButton,
       saliencyMapButton,
-      colorSaliencyMapButton
+      colorSaliencyMapButton,
+      gaborButton
     )
     val layer = new HBox()
     layer.getChildren.addAll(canvas)
