@@ -21,7 +21,7 @@ import _root_.img.filtering.GaborFilter
 
 object HelloSBT extends JFXApp3 {
   override def start(): Unit = {
-    val bufImage: BufferedImage = img.load("./resources/sample.png") match {
+    val bufImage: BufferedImage = img.load("./resources/sample.jpg") match {
       case Success(src) => src
       case Failure(_)   => new BufferedImage(128, 128, TYPE_INT_ARGB)
     }
@@ -90,10 +90,20 @@ object HelloSBT extends JFXApp3 {
     olientSaliencyMapButton.setOnAction((_) -> {
       val saliencyMap = new ittiSaliencyMap()
       val (map0, map45, map90, map135) =
-        saliencyMap.calcOrientationSaliencyMap(image)
+        saliencyMap.calcOrientationSaliencyMap(image.grayScale())
       val out = map0.scaling(0.25) + map45.scaling(0.25) + map90.scaling(
         0.25
       ) + map135.scaling(0.25)
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
+    val ittiSaliencyMapButton: Button = new Button("itti saliency map")
+    ittiSaliencyMapButton.setOnAction((_) -> {
+      val saliencyMap = new ittiSaliencyMap()
+      val out = saliencyMap.saliencyMap(image)
 
       val writableImageFiltered = new WritableImage(out.width, out.height)
       SwingFXUtils.toFXImage(out.image, writableImageFiltered)
@@ -110,6 +120,16 @@ object HelloSBT extends JFXApp3 {
       gc.drawImage(writableImageFiltered, 0, 0)
     })
 
+    val gaborFilterButton: Button = new Button("gabor filter")
+    gaborFilterButton.setOnAction((_) -> {
+      val gaborFilter = new GaborFilter(11, 1.5, 1.2, 3, 0, 0)
+      val out = gaborFilter.filtering(image.grayScale()).normalize()
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
     val layerPane = new Pane();
     layerPane.getChildren().addAll(canvas)
     val buttons = new HBox()
@@ -120,7 +140,9 @@ object HelloSBT extends JFXApp3 {
       saliencyMapButton,
       colorSaliencyMapButton,
       olientSaliencyMapButton,
-      gaborButton
+      gaborButton,
+      ittiSaliencyMapButton,
+      gaborFilterButton
     )
     val layer = new HBox()
     layer.getChildren.addAll(canvas)

@@ -84,13 +84,43 @@ class ittiSaliencyMap() extends SaliencyMap() {
     (rgMap, byMap)
   }
 
-  def calcOrientationSaliencyMap(src: Image): (Image, Image, Image, Image) = {
-    val gaborFilter0 = new GaborFilter(111, 10.0, 1.2, 10, 0, 0)
-    val gaborFilter45 = new GaborFilter(111, 10.0, 1.2, 10, 0, 45)
-    val gaborFilter90 = new GaborFilter(111, 10.0, 1.2, 10, 0, 90)
-    val gaborFilter135 = new GaborFilter(111, 10.0, 1.2, 10, 0, 135)
+  def makeIntensityPyramid(orig: Image): List[Image] = {
+    val pyramid: List[Image] = for (i <- (1 to 6).toList) yield {
+      val upScale: Double = Math.pow(2, i).toDouble
+      val downScale: Double = 1 / upScale
+      val downScaleInterpolation =
+        new BilinearInterpolation(downScale, downScale)
+      val upScaleInterpolation = new BilinearInterpolation(upScale, upScale)
 
-    val gaborFilterdImage0: Image = gaborFilter0.filtering(src)
+      val downscaledImage: Image = downScaleInterpolation.interpolate(orig)
+      val gaussian = gaussianFilter.filtering(downscaledImage)
+      val upScaledImage: Image =
+        upScaleInterpolation.interpolate(gaussian)
+
+      upScaledImage
+    }
+
+    orig :: pyramid
+  }
+
+  def calcIntensitySaliencyMap(src: Image): Image = {
+    val pyramid = makePyramid(src)
+    val out: Image =
+      (pyramid(0) - pyramid(1))
+        .+(pyramid(0) - pyramid(2))
+        .+(pyramid(1) - pyramid(2))
+        .+(pyramid(2) - pyramid(3))
+
+    out.normalize()
+  }
+
+  def calcOrientationSaliencyMap(src: Image): (Image, Image, Image, Image) = {
+    val gaborFilter0 = new GaborFilter(11, 1.5, 1.2, 3, 0, 0)
+    val gaborFilter45 = new GaborFilter(11, 1.5, 1.2, 3, 0, 45)
+    val gaborFilter90 = new GaborFilter(11, 1.5, 1.2, 3, 0, 90)
+    val gaborFilter135 = new GaborFilter(11, 1.5, 1.2, 3, 0, 135)
+
+    val gaborFilterdImage0: Image = gaborFilter0.filtering(src).normalize()
     val gaborFilterdImage45: Image = gaborFilter45.filtering(src)
     val gaborFilterdImage90: Image = gaborFilter90.filtering(src)
     val gaborFilterdImage135: Image = gaborFilter135.filtering(src)
@@ -101,29 +131,46 @@ class ittiSaliencyMap() extends SaliencyMap() {
     val pyramid135 = makePyramid(gaborFilterdImage135)
 
     val map0 =
-      ((pyramid0(0) - pyramid0(0)) - (pyramid0(1) - pyramid0(1)))
-        .+((pyramid0(0) - pyramid0(0)) - (pyramid0(2) - pyramid0(2)))
-        .+((pyramid0(1) - pyramid0(1)) - (pyramid0(2) - pyramid0(2)))
-        .+((pyramid0(2) - pyramid0(2)) - (pyramid0(3) - pyramid0(3)))
+      ((pyramid0(0) - pyramid0(1)))
+        .+((pyramid0(0) - pyramid0(2)))
+        .+((pyramid0(1) - pyramid0(2)))
+        .+((pyramid0(2) - pyramid0(3)))
 
     val map45 =
-      ((pyramid45(0) - pyramid45(0)) - (pyramid45(1) - pyramid45(1)))
-        .+((pyramid45(0) - pyramid45(0)) - (pyramid45(2) - pyramid45(2)))
-        .+((pyramid45(1) - pyramid45(1)) - (pyramid45(2) - pyramid45(2)))
-        .+((pyramid45(2) - pyramid45(2)) - (pyramid45(3) - pyramid45(3)))
+      ((pyramid45(0) - pyramid45(1)))
+        .+((pyramid45(0) - pyramid45(2)))
+        .+((pyramid45(1) - pyramid45(2)))
+        .+((pyramid45(2) - pyramid45(3)))
 
     val map90 =
-      ((pyramid90(0) - pyramid90(0)) - (pyramid90(1) - pyramid90(1)))
-        .+((pyramid90(0) - pyramid90(0)) - (pyramid90(2) - pyramid90(2)))
-        .+((pyramid90(1) - pyramid90(1)) - (pyramid90(2) - pyramid90(2)))
-        .+((pyramid90(2) - pyramid90(2)) - (pyramid90(3) - pyramid90(3)))
+      ((pyramid90(0) - pyramid90(1)))
+        .+((pyramid90(0) - pyramid90(2)))
+        .+((pyramid90(1) - pyramid90(2)))
+        .+((pyramid90(2) - pyramid90(3)))
 
     val map135 =
-      ((pyramid135(0) - pyramid135(0)) - (pyramid135(1) - pyramid135(1)))
-        .+((pyramid135(0) - pyramid135(0)) - (pyramid135(2) - pyramid135(2)))
-        .+((pyramid135(1) - pyramid135(1)) - (pyramid135(2) - pyramid135(2)))
-        .+((pyramid135(2) - pyramid135(2)) - (pyramid135(3) - pyramid135(3)))
+      ((pyramid135(0) - pyramid135(1)))
+        .+((pyramid135(0) - pyramid135(2)))
+        .+((pyramid135(1) - pyramid135(2)))
+        .+((pyramid135(2) - pyramid135(3)))
 
     (map0, map45, map90, map135)
+  }
+
+  override def saliencyMap(orig: Image): Image = {
+    val (rg, by) = calcColorSaliencyMap(orig)
+    val colorMap: Image = rg.scaling(0.5) + by.scaling(0.5)
+    val intensityMap: Image = calcIntensitySaliencyMap(orig.grayScale())
+    val (map0, map45, map90, map135) =
+      calcOrientationSaliencyMap(orig.grayScale())
+    val orientationMap: Image =
+      map0.scaling(0.25) + map45.scaling(0.25) + map90.scaling(0.25) + map135
+        .scaling(0.25)
+
+    val out = colorMap.scaling(0.333) + intensityMap.scaling(
+      0.333
+    ) + orientationMap.scaling(0.333)
+
+    out
   }
 }
