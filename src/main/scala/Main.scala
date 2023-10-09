@@ -18,6 +18,9 @@ import scalafx.scene.layout.VBox
 import img._
 import _root_.img.saliencyMap.ittiSaliencyMap
 import _root_.img.filtering.GaborFilter
+import scalafx.scene.SnapshotParameters
+import java.io.File
+import javax.imageio.ImageIO
 
 object HelloSBT extends JFXApp3 {
   override def start(): Unit = {
@@ -32,7 +35,7 @@ object HelloSBT extends JFXApp3 {
     val writableImage = new WritableImage(image.width, image.height)
     SwingFXUtils.toFXImage(image.image, writableImage)
 
-    val canvas = new Canvas(1080, 1080);
+    val canvas = new Canvas(128, 128);
     val gc = canvas.graphicsContext2D
     gc.drawImage(writableImage, 0, 0)
 
@@ -103,7 +106,8 @@ object HelloSBT extends JFXApp3 {
     val ittiSaliencyMapButton: Button = new Button("itti saliency map")
     ittiSaliencyMapButton.setOnAction((_) -> {
       val saliencyMap = new ittiSaliencyMap()
-      val out = saliencyMap.saliencyMap(image)
+      val out =
+        saliencyMap.saliencyMap(image).grayScale().normalize().grayScale2Jet()
 
       val writableImageFiltered = new WritableImage(out.width, out.height)
       SwingFXUtils.toFXImage(out.image, writableImageFiltered)
@@ -130,6 +134,15 @@ object HelloSBT extends JFXApp3 {
       gc.drawImage(writableImageFiltered, 0, 0)
     })
 
+    val writeButton: Button = new Button("save canvas")
+    writeButton.setOnAction((_) -> {
+      val imagews = new WritableImage(image.width, image.height)
+      val imagew = canvas.snapshot(new SnapshotParameters(), imagews)
+      val file: File = new File("resources/out.png")
+      val buf = new BufferedImage(image.width, image.height, TYPE_INT_ARGB)
+      ImageIO.write(SwingFXUtils.fromFXImage(imagew, buf), "png", file)
+    })
+
     val layerPane = new Pane();
     layerPane.getChildren().addAll(canvas)
     val buttons = new HBox()
@@ -142,7 +155,8 @@ object HelloSBT extends JFXApp3 {
       olientSaliencyMapButton,
       gaborButton,
       ittiSaliencyMapButton,
-      gaborFilterButton
+      gaborFilterButton,
+      writeButton
     )
     val layer = new HBox()
     layer.getChildren.addAll(canvas)

@@ -90,4 +90,59 @@ class Pixel(
 
     new Pixel(x, y, newColor)
   }
+
+  // https://stackoverflow.com/questions/7706339/grayscale-to-red-green-blue-matlab-jet-color-scale
+  def grayscale2Jet(vmin: Double, vmax: Double): Pixel = {
+    // require(red == green)
+    // require(red == blue)
+    // require(green == blue)
+    require(vmin < vmax)
+
+    val gray = red
+
+    val tmpColor: Double =
+      if (gray < vmin) vmin
+      else if (gray > vmax) vmax
+      else gray
+
+    val dv = vmax - vmin
+
+    if (tmpColor < (vmin + 0.25 * dv)) {
+      val jetRed = 0.0
+      val jetGreen = 4 * (tmpColor - vmin) / dv
+      val jetBlue = 1.0
+
+      val jetColor =
+        0xff000000 + ((jetRed * 255).toInt << 16) + ((jetGreen * 255).toInt << 8) + (jetBlue * 255).toInt
+
+      new Pixel(x, y, jetColor)
+    } else if (tmpColor < (vmin + 0.5 * dv)) {
+      val jetRed = 0.0
+      val jetGreen = 1.0
+      val jetBlue = 1 + 4 * (vmin + 0.25 * dv - tmpColor) / dv
+
+      val jetColor =
+        0xff000000 + ((jetRed * 255).toInt << 16) + ((jetGreen * 255).toInt << 8) + (jetBlue * 255).toInt
+
+      new Pixel(x, y, jetColor)
+    } else if (tmpColor < (vmin + 0.75 * dv)) {
+      val jetRed = 4 * (tmpColor - vmin - 0.5 * dv) / dv
+      val jetGreen = 1.0
+      val jetBlue = 0.0
+
+      val jetColor =
+        0xff000000 + ((jetRed * 255).toInt << 16) + ((jetGreen * 255).toInt << 8) + (jetBlue * 255).toInt
+
+      new Pixel(x, y, jetColor)
+    } else {
+      val jetRed = 1.0
+      val jetGreen = 1 + 4 * (vmin + 0.75 * dv - tmpColor) / dv
+      val jetBlue = 0.0
+
+      val jetColor =
+        0xff000000 + ((jetRed * 255).toInt << 16) + ((jetGreen * 255).toInt << 8) + (jetBlue * 255).toInt
+
+      new Pixel(x, y, jetColor)
+    }
+  }
 }

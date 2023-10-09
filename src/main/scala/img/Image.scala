@@ -81,4 +81,10 @@ class Image(pixs: List[Pixel], w: Int, h: Int) {
     new Image(normalizedPixels, width, height)
   }
 
+  def grayScale2Jet(): Image = {
+    val jetPixels: List[Pixel] =
+      for (pix <- pixels) yield pix.grayscale2Jet(0.0, 1.0)
+
+    new Image(jetPixels, width, height)
+  }
 }
