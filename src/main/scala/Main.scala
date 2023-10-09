@@ -24,6 +24,9 @@ import javax.imageio.ImageIO
 import scalafx.stage.Stage
 import scalafx.scene.control.Slider
 import scalafx.scene.control.Label
+import scalafx.scene.control.MenuItem
+import scalafx.scene.control.Menu
+import scalafx.scene.control.MenuBar
 
 object HelloSBT extends JFXApp3 {
   override def start(): Unit = {
@@ -41,15 +44,6 @@ object HelloSBT extends JFXApp3 {
     val canvas = new Canvas(128, 128);
     val gc = canvas.graphicsContext2D
     gc.drawImage(writableImage, 0, 0)
-
-    val grayscaleButton: Button = new Button("grayscale")
-    grayscaleButton.setOnAction((_) -> {
-      val out = image.grayScale()
-
-      val writableImageFiltered = new WritableImage(out.width, out.height)
-      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
-      gc.drawImage(writableImageFiltered, 0, 0)
-    })
 
     val gaussianFilterButton: Button = new Button("gassian filter")
     gaussianFilterButton.setOnAction((_) -> {
@@ -117,8 +111,26 @@ object HelloSBT extends JFXApp3 {
       gc.drawImage(writableImageFiltered, 0, 0)
     })
 
-    val gaborButton: Button = new Button("gabor")
-    gaborButton.setOnAction((_) -> {
+    val writeMenu: MenuItem = new MenuItem("save canvas as png")
+    writeMenu.setOnAction((_) -> {
+      val imagews = new WritableImage(image.width, image.height)
+      val imagew = canvas.snapshot(new SnapshotParameters(), imagews)
+      val file: File = new File("resources/out.png")
+      val buf = new BufferedImage(image.width, image.height, TYPE_INT_ARGB)
+      ImageIO.write(SwingFXUtils.fromFXImage(imagew, buf), "png", file)
+    })
+
+    val debugGrayScaleMenu: MenuItem = new MenuItem("grayscale")
+    debugGrayScaleMenu.setOnAction((_) -> {
+      val out = image.grayScale()
+
+      val writableImageFiltered = new WritableImage(out.width, out.height)
+      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+      gc.drawImage(writableImageFiltered, 0, 0)
+    })
+
+    val debugGaborKernelMenu: MenuItem = new MenuItem("gabor filtering")
+    debugGaborKernelMenu.setOnAction((_) -> {
       val angleSliderWindow: Stage = new Stage()
 
       val angleSlider: Slider = new Slider()
@@ -129,6 +141,8 @@ object HelloSBT extends JFXApp3 {
       angleSlider.setShowTickLabels(true)
       angleSlider.setShowTickMarks(true)
       angleSlider.setPrefWidth(200)
+
+      val gaborKernelCanvas = new Canvas(111, 111);
 
       val lblSliderValue: Label =
         new Label("gabor angle: " + angleSlider.getValue().toString + " [deg]")
@@ -146,15 +160,27 @@ object HelloSBT extends JFXApp3 {
           )
       }
 
-      val applyGaborButton: Button = new Button("apply")
+      val applyGaborButton: Button = new Button("show kernel preview")
       applyGaborButton.setOnAction((_) -> {
         val angle = angleSlider.getValue()
 
         val gaborFilter = new GaborFilter(111, 10.0, 1.2, 10, 0, angle.toInt)
         val out = gaborFilter.kernelToImage
 
-        // close the window
+        val writableImageFiltered = new WritableImage(out.width, out.height)
+        SwingFXUtils.toFXImage(out.image, writableImageFiltered)
+        val gaborKernelGC = gaborKernelCanvas.graphicsContext2D
+        gaborKernelGC.drawImage(writableImageFiltered, 0, 0)
+      })
+
+      val gaborFilteringButton: Button = new Button("filtering!")
+      gaborFilteringButton.setOnAction((_) -> {
+        val angle = angleSlider.getValue()
+
         angleSliderWindow.close()
+
+        val gaborFilter = new GaborFilter(11, 1.5, 1.2, 3, 0, angle.toInt)
+        val out = gaborFilter.filtering(image.grayScale()).normalize()
 
         val writableImageFiltered = new WritableImage(out.width, out.height)
         SwingFXUtils.toFXImage(out.image, writableImageFiltered)
@@ -163,11 +189,17 @@ object HelloSBT extends JFXApp3 {
 
       val sliderRoot = new VBox()
       sliderRoot.getChildren
-        .addAll(angleSlider, lblSliderValue, applyGaborButton)
+        .addAll(
+          angleSlider,
+          lblSliderValue,
+          applyGaborButton,
+          gaborKernelCanvas,
+          gaborFilteringButton
+        )
 
       angleSliderWindow.setTitle("sample")
       val anglePane: Pane = new Pane()
-      anglePane.setPrefSize(300, 150)
+      anglePane.setPrefSize(500, 250)
       anglePane.getChildren().addAll(sliderRoot)
 
       // angleSliderWindow.setScene(new Scene(200, 100))
@@ -175,44 +207,31 @@ object HelloSBT extends JFXApp3 {
       angleSliderWindow.show()
     })
 
-    val gaborFilterButton: Button = new Button("gabor filter")
-    gaborFilterButton.setOnAction((_) -> {
-      val gaborFilter = new GaborFilter(11, 1.5, 1.2, 3, 0, 0)
-      val out = gaborFilter.filtering(image.grayScale()).normalize()
-
-      val writableImageFiltered = new WritableImage(out.width, out.height)
-      SwingFXUtils.toFXImage(out.image, writableImageFiltered)
-      gc.drawImage(writableImageFiltered, 0, 0)
-    })
-
-    val writeButton: Button = new Button("save canvas")
-    writeButton.setOnAction((_) -> {
-      val imagews = new WritableImage(image.width, image.height)
-      val imagew = canvas.snapshot(new SnapshotParameters(), imagews)
-      val file: File = new File("resources/out.png")
-      val buf = new BufferedImage(image.width, image.height, TYPE_INT_ARGB)
-      ImageIO.write(SwingFXUtils.fromFXImage(imagew, buf), "png", file)
-    })
-
     val layerPane = new Pane();
     layerPane.getChildren().addAll(canvas)
+
+    val fileMenu: Menu = new Menu("_File")
+    fileMenu.getItems().addAll(writeMenu)
+
+    val debugMenu: Menu = new Menu("_Debug")
+    debugMenu.getItems().addAll(debugGrayScaleMenu, debugGaborKernelMenu)
+
+    val menuBar: MenuBar = new MenuBar()
+    menuBar.getMenus().addAll(fileMenu, debugMenu)
+
     val buttons = new HBox()
     buttons.getChildren.addAll(
-      grayscaleButton,
       gaussianFilterButton,
       biliearInterpolateButton,
       saliencyMapButton,
       colorSaliencyMapButton,
       olientSaliencyMapButton,
-      gaborButton,
-      ittiSaliencyMapButton,
-      gaborFilterButton,
-      writeButton
+      ittiSaliencyMapButton
     )
     val layer = new HBox()
     layer.getChildren.addAll(canvas)
     val root = new VBox()
-    root.getChildren.addAll(buttons, layer)
+    root.getChildren.addAll(menuBar, buttons, layer)
 
     stage = new JFXApp3.PrimaryStage {
       scene = new Scene(root)
