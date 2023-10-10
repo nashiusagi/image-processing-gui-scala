@@ -86,7 +86,7 @@ class Filter(kSize: Int) {
       )
       .foldLeft(0.0)(_ + _)
 
-    List(sumR, sumG, sumB).map(c => clip(c, 1.0))
+    List(sumR, sumG, sumB).map(c => clip(c, 0.0, 1.0))
   }
 
   def padding(src: Image): Image = {
@@ -137,5 +137,9 @@ class Filter(kSize: Int) {
     new Image(unpaddedPixels, unpaddedWidth, unpaddedHeight)
   }
 
-  def clip(x: Double, ceil: Double) = if (x < ceil) x else ceil
+  def clip(x: Double, floor: Double, ceil: Double) = {
+    if (x > floor && x < ceil) x
+    else if (x <= floor) floor
+    else ceil
+  }
 }
