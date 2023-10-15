@@ -18,7 +18,7 @@ package object img {
 
     for (iter <- (0 until width * height).toList) yield {
       val x = iter % width
-      val y = iter / height
+      val y = iter / width
       val color = src.getRGB(x, y)
 
       new Pixel(x, y, color)

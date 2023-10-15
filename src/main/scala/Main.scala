@@ -30,7 +30,7 @@ import scalafx.scene.control.MenuBar
 
 object HelloSBT extends JFXApp3 {
   override def start(): Unit = {
-    val bufImage: BufferedImage = img.load("./resources/sample.jpg") match {
+    val bufImage: BufferedImage = img.load("./resources/test1.jpg") match {
       case Success(src) => src
       case Failure(_)   => new BufferedImage(128, 128, TYPE_INT_ARGB)
     }
@@ -41,7 +41,7 @@ object HelloSBT extends JFXApp3 {
     val writableImage = new WritableImage(image.width, image.height)
     SwingFXUtils.toFXImage(image.image, writableImage)
 
-    val canvas = new Canvas(128, 128);
+    val canvas = new Canvas(500, 500);
     val gc = canvas.graphicsContext2D
     gc.drawImage(writableImage, 0, 0)
 
