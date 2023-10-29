@@ -47,12 +47,15 @@ object HelloSBT extends JFXApp3 {
 
     val gaussianFilterButton: Button = new Button("gassian filter")
     gaussianFilterButton.setOnAction((_) -> {
+      val from = java.time.OffsetDateTime.now()
       val gaussianFilter = new GaussianFilter(3, 1.3)
       val out = gaussianFilter.filtering(image)
 
       val writableImageFiltered = new WritableImage(out.width, out.height)
       SwingFXUtils.toFXImage(out.image, writableImageFiltered)
       gc.drawImage(writableImageFiltered, 0, 0)
+      val to = java.time.OffsetDateTime.now()
+      println(to.toInstant.toEpochMilli - from.toInstant.toEpochMilli())
     })
 
     val biliearInterpolateButton: Button = new Button("bi-linear")
