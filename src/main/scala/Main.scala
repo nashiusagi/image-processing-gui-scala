@@ -34,7 +34,7 @@ object HelloSBT extends JFXApp3 {
       case Success(src) => src
       case Failure(_)   => new BufferedImage(128, 128, TYPE_INT_ARGB)
     }
-    val origPixels: List[Pixel] = img.bufferedImageToPixels(bufImage)
+    val origPixels: Seq[Pixel] = img.bufferedImageToPixels(bufImage)
     val image: Image =
       new Image(origPixels, bufImage.getWidth, bufImage.getHeight)
 

@@ -5,7 +5,7 @@ import _root_.img.filtering.GaborFilter
 
 class ittiSaliencyMap() extends SaliencyMap() {
   def calcRImage(src: Image): Image = {
-    val rPixels: List[Pixel] = for (pixel <- src.pixels) yield {
+    val rPixels: Seq[Pixel] = for (pixel <- src.pixels) yield {
       val tmpValue = pixel.red - (pixel.green + pixel.blue) / 2
       val newValue = Math.max(tmpValue, 0.0)
       val newColor =
@@ -18,7 +18,7 @@ class ittiSaliencyMap() extends SaliencyMap() {
   }
 
   def calcGImage(src: Image): Image = {
-    val gPixels: List[Pixel] = for (pixel <- src.pixels) yield {
+    val gPixels: Seq[Pixel] = for (pixel <- src.pixels) yield {
       val tmpValue = pixel.green - (pixel.red + pixel.blue) / 2
       val newValue = Math.max(tmpValue, 0.0)
       val newColor =
@@ -31,7 +31,7 @@ class ittiSaliencyMap() extends SaliencyMap() {
   }
 
   def calcBImage(src: Image): Image = {
-    val bPixels: List[Pixel] = for (pixel <- src.pixels) yield {
+    val bPixels: Seq[Pixel] = for (pixel <- src.pixels) yield {
       val tmpValue = pixel.blue - (pixel.red + pixel.green) / 2
       val newValue = Math.max(tmpValue, 0.0)
       val newColor =
@@ -44,7 +44,7 @@ class ittiSaliencyMap() extends SaliencyMap() {
   }
 
   def calcYImage(src: Image): Image = {
-    val yPixels: List[Pixel] = for (pixel <- src.pixels) yield {
+    val yPixels: Seq[Pixel] = for (pixel <- src.pixels) yield {
       val tmpValue = (pixel.red + pixel.green) / 2 - Math.abs(
         pixel.red - pixel.green
       ) / 2 - pixel.blue
@@ -84,8 +84,8 @@ class ittiSaliencyMap() extends SaliencyMap() {
     (rgMap, byMap)
   }
 
-  def makeIntensityPyramid(orig: Image): List[Image] = {
-    val pyramid: List[Image] = for (i <- (1 to 6).toList) yield {
+  def makeIntensityPyramid(orig: Image): Seq[Image] = {
+    val pyramid: Seq[Image] = for (i <- (1 to 6)) yield {
       val upScale: Double = Math.pow(2, i).toDouble
       val downScale: Double = 1 / upScale
       val downScaleInterpolation =
@@ -100,7 +100,7 @@ class ittiSaliencyMap() extends SaliencyMap() {
       upScaledImage
     }
 
-    orig :: pyramid
+    orig +: pyramid
   }
 
   def calcIntensitySaliencyMap(src: Image): Image = {

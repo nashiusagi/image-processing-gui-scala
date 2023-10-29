@@ -12,11 +12,11 @@ package object img {
     Try(ImageIO.read(file))
   }
 
-  def bufferedImageToPixels(src: BufferedImage): List[Pixel] = {
+  def bufferedImageToPixels(src: BufferedImage): Seq[Pixel] = {
     val width: Int = src.getWidth
     val height: Int = src.getHeight
 
-    for (iter <- (0 until width * height).toList) yield {
+    for (iter <- (0 until width * height)) yield {
       val x = iter % width
       val y = iter / height
       val color = src.getRGB(x, y)

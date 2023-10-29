@@ -7,17 +7,17 @@ class Filter(kSize: Int) {
   val kernelSize: Int = kSize
   val paddingSize: Int = kernelSize / 2
 
-  val kernel: List[Double] =
-    for (i <- (0 until kernelSize * kernelSize).toList)
+  val kernel: Seq[Double] =
+    for (i <- (0 until kernelSize * kernelSize))
       yield 1.0 / (kernelSize * kernelSize)
 
   def filtering(src: Image): Image = {
     val paddedImg: Image = padding(src)
 
-    val filteredPixels: List[Pixel] =
+    val filteredPixels: Seq[Pixel] =
       for (
-        y <- (0 until paddedImg.height).toList;
-        x <- (0 until paddedImg.width).toList
+        y <- (0 until paddedImg.height);
+        x <- (0 until paddedImg.width)
       ) yield {
         if (
           y < paddingSize || y > src.height + paddingSize - 1 || x < paddingSize || x > src.width + paddingSize - 1
@@ -48,12 +48,12 @@ class Filter(kSize: Int) {
   }
 
   def fold(
-      kernel: List[Double],
+      kernel: Seq[Double],
       paddedImg: Image,
       x: Int,
       y: Int
-  ): List[Double] = {
-    val sumR: Double = (0 until kernelSize * kernelSize).toList
+  ): Seq[Double] = {
+    val sumR: Double = (0 until kernelSize * kernelSize)
       .map(idx =>
         kernel(idx) * paddedImg
           .getPixel(
@@ -64,7 +64,7 @@ class Filter(kSize: Int) {
       )
       .foldLeft(0.0)(_ + _)
 
-    val sumG: Double = (0 until kernelSize * kernelSize).toList
+    val sumG: Double = (0 until kernelSize * kernelSize)
       .map(idx =>
         kernel(idx) * paddedImg
           .getPixel(
@@ -75,7 +75,7 @@ class Filter(kSize: Int) {
       )
       .foldLeft(0.0)(_ + _)
 
-    val sumB: Double = (0 until kernelSize * kernelSize).toList
+    val sumB: Double = (0 until kernelSize * kernelSize)
       .map(idx =>
         kernel(idx) * paddedImg
           .getPixel(
@@ -86,7 +86,7 @@ class Filter(kSize: Int) {
       )
       .foldLeft(0.0)(_ + _)
 
-    List(sumR, sumG, sumB).map(c => clip(c, 0.0, 1.0))
+    Seq(sumR, sumG, sumB).map(c => clip(c, 0.0, 1.0))
   }
 
   def padding(src: Image): Image = {
@@ -95,7 +95,7 @@ class Filter(kSize: Int) {
 
     val paddedPixels =
       for (
-        y <- (0 until paddedHeight).toList; x <- (0 until paddedWidth).toList
+        y <- (0 until paddedHeight); x <- (0 until paddedWidth)
       )
         yield {
           if (
@@ -121,8 +121,8 @@ class Filter(kSize: Int) {
 
     val unpaddedPixels =
       for (
-        y <- (paddingSize until src.height - paddingSize).toList;
-        x <- (paddingSize until src.width - paddingSize).toList
+        y <- (paddingSize until src.height - paddingSize);
+        x <- (paddingSize until src.width - paddingSize)
       )
         yield {
           new Pixel(

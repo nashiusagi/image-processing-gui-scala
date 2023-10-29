@@ -3,10 +3,10 @@ package img
 import java.awt.image.BufferedImage
 import java.awt.image.BufferedImage.TYPE_INT_ARGB
 
-class Image(pixs: List[Pixel], w: Int, h: Int) {
+class Image(pixs: Seq[Pixel], w: Int, h: Int) {
   val width: Int = w
   val height: Int = h
-  val pixels: List[Pixel] = pixs
+  val pixels: Seq[Pixel] = pixs
   val image = pixels2BufferedImage()
 
   def pixels2BufferedImage(): BufferedImage = {
@@ -26,8 +26,8 @@ class Image(pixs: List[Pixel], w: Int, h: Int) {
     require(width == that.width)
     require(height == that.height)
 
-    val sumPixels: List[Pixel] =
-      for (i <- (0 until width * height).toList)
+    val sumPixels: Seq[Pixel] =
+      for (i <- (0 until width * height))
         yield {
           val src = this.pixels(i)
           val dst = that.pixels(i)
@@ -41,8 +41,8 @@ class Image(pixs: List[Pixel], w: Int, h: Int) {
     require(width == that.width)
     require(height == that.height)
 
-    val diffPixels: List[Pixel] =
-      for (i <- (0 until width * height).toList)
+    val diffPixels: Seq[Pixel] =
+      for (i <- (0 until width * height))
         yield {
           val src = this.pixels(i)
           val dst = that.pixels(i)
@@ -53,7 +53,7 @@ class Image(pixs: List[Pixel], w: Int, h: Int) {
   }
 
   def scaling(scalar: Double): Image = {
-    val scaledPixels: List[Pixel] =
+    val scaledPixels: Seq[Pixel] =
       for (pix <- this.pixels)
         yield {
           pix.scaling(scalar)
@@ -63,18 +63,18 @@ class Image(pixs: List[Pixel], w: Int, h: Int) {
   }
 
   def grayScale(): Image = {
-    val grayscalePixels: List[Pixel] = for (pix <- pixels) yield pix.grayScale()
+    val grayscalePixels: Seq[Pixel] = for (pix <- pixels) yield pix.grayScale()
 
     new Image(grayscalePixels, width, height)
   }
 
   def normalize(): Image = {
     // red == green == blue if grayscale
-    val grayColorList: List[Double] = for (pix <- pixels) yield pix.red
+    val grayColorList: Seq[Double] = for (pix <- pixels) yield pix.red
 
     val maxGrayColor = grayColorList.max
 
-    val normalizedPixels: List[Pixel] =
+    val normalizedPixels: Seq[Pixel] =
       for (pix <- pixels)
         yield pix.normalize(maxGrayColor, maxGrayColor, maxGrayColor)
 
@@ -82,7 +82,7 @@ class Image(pixs: List[Pixel], w: Int, h: Int) {
   }
 
   def grayScale2Jet(): Image = {
-    val jetPixels: List[Pixel] =
+    val jetPixels: Seq[Pixel] =
       for (pix <- pixels) yield pix.grayscale2Jet(0.0, 1.0)
 
     new Image(jetPixels, width, height)

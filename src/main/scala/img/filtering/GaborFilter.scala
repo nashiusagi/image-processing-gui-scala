@@ -16,11 +16,11 @@ class GaborFilter(
   val psi = _psi
   val angle = _angle
 
-  override val kernel: List[Double] = calcGabor
+  override val kernel: Seq[Double] = calcGabor
 
-  private def calcGabor: List[Double] = {
-    val gaborResult: List[Double] =
-      for (y <- (0 until kernelSize).toList; x <- (0 until kernelSize).toList)
+  private def calcGabor: Seq[Double] = {
+    val gaborResult: Seq[Double] =
+      for (y <- (0 until kernelSize); x <- (0 until kernelSize))
         yield {
           val px = x - paddingSize
           val py = y - paddingSize
@@ -45,8 +45,8 @@ class GaborFilter(
 
   def kernelToImage: Image = {
     val standardKernel = kernel.map(x => x - kernel.min)
-    val kernelToPixels: List[Pixel] =
-      for (i <- (0 until kernelSize * kernelSize).toList) yield {
+    val kernelToPixels: Seq[Pixel] =
+      for (i <- (0 until kernelSize * kernelSize)) yield {
         val x = i % kernelSize
         val y = i / kernelSize
 
