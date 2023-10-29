@@ -62,7 +62,7 @@ class Filter(kSize: Int) {
           )
           .red
       )
-      .foldLeft(0.0)(_ + _)
+      .sum
 
     val sumG: Double = (0 until kernelSize * kernelSize)
       .map(idx =>
@@ -73,7 +73,7 @@ class Filter(kSize: Int) {
           )
           .green
       )
-      .foldLeft(0.0)(_ + _)
+      .sum
 
     val sumB: Double = (0 until kernelSize * kernelSize)
       .map(idx =>
@@ -84,7 +84,7 @@ class Filter(kSize: Int) {
           )
           .blue
       )
-      .foldLeft(0.0)(_ + _)
+      .sum
 
     Seq(sumR, sumG, sumB).map(c => clip(c, 0.0, 1.0))
   }
