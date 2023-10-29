@@ -3,22 +3,24 @@ package img.filtering
 import img.Image
 import img.Pixel
 
+import scala.collection.immutable.ArraySeq
+
 class Filter(kSize: Int) {
   val kernelSize: Int = kSize
   val paddingSize: Int = kernelSize / 2
-  val bufferRange = (0 until kernelSize * kernelSize)
+  val bufferRange = (0 until kernelSize * kernelSize).to(ArraySeq)
 
   val kernel: Seq[Double] =
-    for (i <- bufferRange)
-      yield 1.0 / (kernelSize * kernelSize)
+    (for (i <- bufferRange)
+      yield 1.0 / (kernelSize * kernelSize)).to(ArraySeq)
 
   def filtering(src: Image): Image = {
     val paddedImg: Image = padding(src)
 
-    val filteredPixels: Seq[Pixel] =
+    val filteredPixels: ArraySeq[Pixel] =
       for (
-        y <- (0 until paddedImg.height);
-        x <- (0 until paddedImg.width)
+        y <- (0 until paddedImg.height).to(ArraySeq);
+        x <- (0 until paddedImg.width).to(ArraySeq)
       ) yield {
         if (
           y < paddingSize || y > src.height + paddingSize - 1 || x < paddingSize || x > src.width + paddingSize - 1
@@ -95,9 +97,7 @@ class Filter(kSize: Int) {
     val paddedHeight = src.height + 2 * paddingSize
 
     val paddedPixels =
-      for (
-        y <- (0 until paddedHeight); x <- (0 until paddedWidth)
-      )
+      for (y <- (0 until paddedHeight); x <- (0 until paddedWidth))
         yield {
           if (
             y < paddingSize || y > src.height + paddingSize - 1 || x < paddingSize || x > src.width + paddingSize - 1

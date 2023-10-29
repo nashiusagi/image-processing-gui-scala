@@ -1,6 +1,7 @@
 package img.filtering
 
 import img._
+import scala.collection.immutable.ArraySeq
 
 class GaborFilter(
     ksize: Int,
@@ -16,7 +17,7 @@ class GaborFilter(
   val psi = _psi
   val angle = _angle
 
-  override val kernel: Seq[Double] = calcGabor
+  override val kernel: Seq[Double] = calcGabor.to(ArraySeq)
 
   private def calcGabor: Seq[Double] = {
     val gaborResult: Seq[Double] =

@@ -1,6 +1,7 @@
 package img.filtering
 
 import java.lang.Math
+import scala.collection.immutable.ArraySeq
 
 class GaussianFilter(kSize: Int, sigma: Double) extends Filter(kSize) {
   override val kernel: Seq[Double] = {
@@ -10,5 +11,5 @@ class GaussianFilter(kSize: Int, sigma: Double) extends Filter(kSize) {
           -((x - paddingSize) * (x - paddingSize) + (y - paddingSize) * (y - paddingSize))
         ) / (2.0 * sigma * sigma)
       }
-  }
+  }.to(ArraySeq)
 }
