@@ -6,9 +6,10 @@ import img.Pixel
 class Filter(kSize: Int) {
   val kernelSize: Int = kSize
   val paddingSize: Int = kernelSize / 2
+  val bufferRange = (0 until kernelSize * kernelSize)
 
   val kernel: Seq[Double] =
-    for (i <- (0 until kernelSize * kernelSize))
+    for (i <- bufferRange)
       yield 1.0 / (kernelSize * kernelSize)
 
   def filtering(src: Image): Image = {
@@ -53,7 +54,7 @@ class Filter(kSize: Int) {
       x: Int,
       y: Int
   ): Seq[Double] = {
-    val sumR: Double = (0 until kernelSize * kernelSize)
+    val sumR: Double = bufferRange
       .map(idx =>
         kernel(idx) * paddedImg
           .getPixel(
@@ -64,7 +65,7 @@ class Filter(kSize: Int) {
       )
       .sum
 
-    val sumG: Double = (0 until kernelSize * kernelSize)
+    val sumG: Double = bufferRange
       .map(idx =>
         kernel(idx) * paddedImg
           .getPixel(
@@ -75,7 +76,7 @@ class Filter(kSize: Int) {
       )
       .sum
 
-    val sumB: Double = (0 until kernelSize * kernelSize)
+    val sumB: Double = bufferRange
       .map(idx =>
         kernel(idx) * paddedImg
           .getPixel(
