@@ -13,8 +13,8 @@ class BilinearInterpolation(rx: Double, ry: Double) {
     val aW: Int = (ax * srcWidth).toInt
 
     // output image
-    val interpolatedPixels: List[Pixel] =
-      for (y <- (0 until aH).toList; x <- (0 until aW).toList) yield {
+    val interpolatedPixels: Seq[Pixel] =
+      for (y <- (0 until aH); x <- (0 until aW)) yield {
         val yBefore = Math.min(Math.floor(y / ay).toInt, srcHeight - 2)
         val dy: Double = ((y / ay).toInt - yBefore).toDouble
 
