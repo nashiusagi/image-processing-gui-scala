@@ -212,16 +212,16 @@ object HelloSBT extends JFXApp3 {
     })
 
     val layer1Button: Button = new Button("layer1");
-    layer1Button.setOnAction((_)->{
+    layer1Button.setOnAction((_) -> {
       canvas.toFront();
     });
     val layer2Button: Button = new Button("layer2");
-    layer2Button.setOnAction((_)->{
+    layer2Button.setOnAction((_) -> {
       canvas2.toFront();
     });
 
     val layerPane = new Pane();
-    layerPane.getChildren().addAll(canvas,canvas2)
+    layerPane.getChildren().addAll(canvas, canvas2)
 
     val layerButtons = new VBox();
     layerButtons.getChildren().addAll(layer1Button, layer2Button)
