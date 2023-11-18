@@ -117,17 +117,26 @@ class ittiSaliencyMap() extends SaliencyMap() {
   def calcOrientationSaliencyMap(src: Image): (Image, Image, Image, Image) = {
     import scala.concurrent.{Future, Await}
     import scala.concurrent.duration.FiniteDuration
-    implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
+    implicit val ec: scala.concurrent.ExecutionContext =
+      scala.concurrent.ExecutionContext.global
 
     val gaborFilter0 = new GaborFilter(11, 1.5, 1.2, 3, 0, 0)
     val gaborFilter45 = new GaborFilter(11, 1.5, 1.2, 3, 0, 45)
     val gaborFilter90 = new GaborFilter(11, 1.5, 1.2, 3, 0, 90)
     val gaborFilter135 = new GaborFilter(11, 1.5, 1.2, 3, 0, 135)
 
-    val gaborFilterdImage0: Future[Image] = Future { gaborFilter0.filtering(src).normalize() }
-    val gaborFilterdImage45: Future[Image] = Future{ gaborFilter45.filtering(src) }
-    val gaborFilterdImage90: Future[Image] = Future { gaborFilter90.filtering(src) }
-    val gaborFilterdImage135: Future[Image] = Future { gaborFilter135.filtering(src)}
+    val gaborFilterdImage0: Future[Image] = Future {
+      gaborFilter0.filtering(src).normalize()
+    }
+    val gaborFilterdImage45: Future[Image] = Future {
+      gaborFilter45.filtering(src)
+    }
+    val gaborFilterdImage90: Future[Image] = Future {
+      gaborFilter90.filtering(src)
+    }
+    val gaborFilterdImage135: Future[Image] = Future {
+      gaborFilter135.filtering(src)
+    }
 
     val pyramid0 = gaborFilterdImage0.map(makePyramid(_))
     val pyramid45 = gaborFilterdImage45.map(makePyramid(_))
@@ -162,8 +171,11 @@ class ittiSaliencyMap() extends SaliencyMap() {
         .+((pyramid135(2) - pyramid135(3)))
     )
 
-    val result = Await.result(Future.sequence(Seq(map0, map45, map90, map135)), FiniteDuration(30, "seconds"))
-    //(map0, map45, map90, map135)
+    val result = Await.result(
+      Future.sequence(Seq(map0, map45, map90, map135)),
+      FiniteDuration(30, "seconds")
+    )
+    // (map0, map45, map90, map135)
     (result(0), result(1), result(2), result(3))
   }
 

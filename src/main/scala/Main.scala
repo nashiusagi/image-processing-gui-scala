@@ -45,6 +45,10 @@ object HelloSBT extends JFXApp3 {
     val gc = canvas.graphicsContext2D
     gc.drawImage(writableImage, 0, 0)
 
+    val canvas2 = new Canvas(128, 128);
+    val gc2 = canvas2.graphicsContext2D
+    gc2.drawImage(writableImage, 0, 0)
+
     val gaussianFilterButton: Button = new Button("gassian filter")
     gaussianFilterButton.setOnAction((_) -> {
       val gaussianFilter = new GaussianFilter(3, 1.3)
@@ -207,8 +211,23 @@ object HelloSBT extends JFXApp3 {
       angleSliderWindow.show()
     })
 
+    val layer1Button: Button = new Button("layer1");
+    layer1Button.setOnAction((_) -> {
+      canvas.toFront();
+    });
+    val layer2Button: Button = new Button("layer2");
+    layer2Button.setOnAction((_) -> {
+      canvas2.toFront();
+    });
+
     val layerPane = new Pane();
-    layerPane.getChildren().addAll(canvas)
+    layerPane.getChildren().addAll(canvas, canvas2)
+
+    val layerButtons = new VBox();
+    layerButtons.getChildren().addAll(layer1Button, layer2Button)
+
+    val layers = new HBox();
+    layers.getChildren().addAll(layerPane, layerButtons);
 
     val fileMenu: Menu = new Menu("_File")
     fileMenu.getItems().addAll(writeMenu)
@@ -228,10 +247,8 @@ object HelloSBT extends JFXApp3 {
       olientSaliencyMapButton,
       ittiSaliencyMapButton
     )
-    val layer = new HBox()
-    layer.getChildren.addAll(canvas)
     val root = new VBox()
-    root.getChildren.addAll(menuBar, buttons, layer)
+    root.getChildren.addAll(menuBar, buttons, layers)
 
     stage = new JFXApp3.PrimaryStage {
       scene = new Scene(root)
